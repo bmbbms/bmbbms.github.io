@@ -163,6 +163,89 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bmbbms.github.io/blog/2023/10/go%E5%91%BD%E4%BB%A4%E8%A1%8C%E8%A7%A3%E6%9E%90.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="bmb">
+      <meta itemprop="description" content="虚实无常">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="bmb">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2023/10/go%E5%91%BD%E4%BB%A4%E8%A1%8C%E8%A7%A3%E6%9E%90.html" class="post-title-link" itemprop="url">go命令行解析</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-10-10 09:01:16 / 修改时间：14:22:17" itemprop="dateCreated datePublished" datetime="2023-10-10T09:01:16+08:00">2023-10-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/go%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">go基础</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="flag用法"><a href="#flag用法" class="headerlink" title="flag用法"></a>flag用法</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">package main</span><br><span class="line"></span><br><span class="line">import (</span><br><span class="line">	<span class="string">&quot;flag&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;strings&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line">flag使用几种方式</span><br><span class="line">1. flag.Xxx</span><br><span class="line">2. flag.XxxVar</span><br><span class="line">3. 自定义类型flag.Var解析</span><br><span class="line">4. flagset生成子命令</span><br><span class="line">*/</span><br><span class="line"><span class="built_in">type</span> interval []time.Duration</span><br><span class="line"></span><br><span class="line">func (i *interval) String() string &#123;</span><br><span class="line">	<span class="built_in">return</span> fmt.Sprint(*i)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func (i *interval) Set(value string) error &#123;</span><br><span class="line">	// 此部分如果不注释，就不允许同一个参数定义多次，-interval 30m -interval 10m 是不允许。</span><br><span class="line">	//if len(*i) &gt; 0 &#123;</span><br><span class="line">	//	<span class="built_in">return</span> errors.New(<span class="string">&quot;interval flag already set&quot;</span>)</span><br><span class="line">	//&#125;</span><br><span class="line">	<span class="keyword">for</span> _, dt := range strings.Split(value, <span class="string">&quot;,&quot;</span>) &#123;</span><br><span class="line">		duration, err := time.ParseDuration(dt)</span><br><span class="line">		<span class="keyword">if</span> err != nil &#123;</span><br><span class="line">			<span class="built_in">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">		*i = append(*i, duration)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">return</span> nil</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func <span class="function"><span class="title">main</span></span>() &#123;</span><br><span class="line">	//flag.Xxx()，其中 Xxx 可以是 Int、String 等；返回一个相应类型的指针</span><br><span class="line">	wordPtr := flag.String(<span class="string">&quot;word&quot;</span>, <span class="string">&quot;test&quot;</span>, <span class="string">&quot;word&quot;</span>)</span><br><span class="line">	durtion := flag.Duration(<span class="string">&quot;duration&quot;</span>, time.Minute, <span class="string">&quot;set time duration&quot;</span>)</span><br><span class="line">	//flag.XxxVar()，其中 XxxVar 可以是 Int、String 等；将 flag 绑定到一个变量上</span><br><span class="line">	var svar string</span><br><span class="line">	flag.StringVar(&amp;svar, <span class="string">&quot;svar&quot;</span>, <span class="string">&quot;bar&quot;</span>, <span class="string">&quot;a string var&quot;</span>)</span><br><span class="line">	//flag.Var解析自定义类型</span><br><span class="line">	var i interval</span><br><span class="line">	flag.Var(&amp;i, <span class="string">&quot;interval&quot;</span>, <span class="string">&quot;解析url&quot;</span>)</span><br><span class="line"></span><br><span class="line">	flag.Parse()</span><br><span class="line">	fmt.Println(<span class="string">&quot;word:&quot;</span>, *wordPtr)</span><br><span class="line"></span><br><span class="line">	fmt.Println(<span class="string">&quot;stringval:&quot;</span>, svar)</span><br><span class="line">	fmt.Println(<span class="string">&quot;durtion:&quot;</span>, *durtion)</span><br><span class="line">	fmt.Println(<span class="string">&quot;custom:&quot;</span>, i)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="pflag用法"><a href="#pflag用法" class="headerlink" title="pflag用法"></a>pflag用法</h1><h1 id="viper用法"><a href="#viper用法" class="headerlink" title="viper用法"></a>viper用法</h1><h1 id="corbra用法"><a href="#corbra用法" class="headerlink" title="corbra用法"></a>corbra用法</h1>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://bmbbms.github.io/blog/2023/10/channel%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -397,20 +480,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-count">3</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">2</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -446,12 +529,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">0k</span>
+    <span title="站点总字数">2k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">1 分钟</span>
+    <span title="站点阅读时长">2 分钟</span>
 </div>
   <div class="powered-by">bmb
   </div>
