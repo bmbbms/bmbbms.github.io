@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"bmbbms.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="go常用命令行包使用汇总 flag, pflag, viper, corba">
+<meta property="og:type" content="article">
+<meta property="og:title" content="go命令行解析">
+<meta property="og:url" content="https://bmbbms.github.io/blog/2023/10/2023-10-10-go%E5%91%BD%E4%BB%A4%E8%A1%8C%E8%A7%A3%E6%9E%90.html">
+<meta property="og:site_name" content="bmb">
+<meta property="og:description" content="go常用命令行包使用汇总 flag, pflag, viper, corba">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-10-10T01:01:16.000Z">
+<meta property="article:modified_time" content="2023-10-11T08:21:26.893Z">
+<meta property="article:author" content="bmb">
+<meta property="article:tag" content="go">
+<meta property="article:tag" content="cli">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://bmbbms.github.io/blog/2023/10/2023-10-10-go%E5%91%BD%E4%BB%A4%E8%A1%8C%E8%A7%A3%E6%9E%90.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>go命令行解析 | bmb</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">bmb</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">虚无</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bmbbms.github.io/blog/2023/10/2023-10-10-go%E5%91%BD%E4%BB%A4%E8%A1%8C%E8%A7%A3%E6%9E%90.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="bmb">
+      <meta itemprop="description" content="虚实无常">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="bmb">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          go命令行解析
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-10-10 09:01:16" itemprop="dateCreated datePublished" datetime="2023-10-10T09:01:16+08:00">2023-10-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-10-11 16:21:26" itemprop="dateModified" datetime="2023-10-11T16:21:26+08:00">2023-10-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/go%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">go基础</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>9.5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>9 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>go常用命令行包使用汇总 flag, pflag, viper, corba</p>
+<span id="more"></span>
+
+<h1 id="flag用法"><a href="#flag用法" class="headerlink" title="flag用法"></a>flag用法</h1><p>flag使用几种方式</p>
+<ol>
+<li>flag.Xxx, 其中 Xxx 可以是 Int、String 等；返回一个相应类型的指针</li>
+<li>flag.XxxVar,其中 XxxVar 可以是 Int、String 等；将 flag 绑定到一个变量上</li>
+<li>自定义类型flag.Var解析. 自定义类型需要实现flag.Value接口中的方法 Set 和String</li>
+<li>flagset生成子命令</li>
+</ol>
+<p>&#x2F;&#x2F;解析 flag<br>通过以上几种方法定义好命令行flag参数后，需要通过调用flag.Parse()来对命令行参数进行解析。</p>
+<p>支持的命令行参数格式有以下几种：</p>
+<p>-flag xxx （使用空格，一个-符号）<br>–flag xxx （使用空格，两个-符号）<br>-flag&#x3D;xxx （使用等号，一个-符号）<br>–flag&#x3D;xxx （使用等号，两个-符号）<br>其中，布尔类型的参数必须使用等号的方式指定。bool类型如果flag出现就为true,否则为默认值，只能使用&#x3D;号连接<br>Flag解析在第一个非flag参数（单个”-“不是flag参数）之前停止，或者在终止符”–“之后停止。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;flag&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;strings&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">flag使用几种方式</span></span><br><span class="line"><span class="comment">1. flag.Xxx, 其中 Xxx 可以是 Int、String 等；返回一个相应类型的指针</span></span><br><span class="line"><span class="comment">2. flag.XxxVar,其中 XxxVar 可以是 Int、String 等；将 flag 绑定到一个变量上</span></span><br><span class="line"><span class="comment">3. 自定义类型flag.Var解析. 自定义类型需要实现flag.Value接口中的方法 Set 和String</span></span><br><span class="line"><span class="comment">4. flagset生成子命令</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">type</span> interval []time.Duration</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(i *interval)</span></span> String() <span class="type">string</span> &#123;</span><br><span class="line">	<span class="keyword">return</span> fmt.Sprint(*i)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(i *interval)</span></span> Set(value <span class="type">string</span>) <span class="type">error</span> &#123;</span><br><span class="line">	<span class="comment">// 此部分如果不注释，就不允许同一个参数定义多次，-interval 30m -interval 10m 是不允许。</span></span><br><span class="line">	<span class="comment">//if len(*i) &gt; 0 &#123;</span></span><br><span class="line">	<span class="comment">//	return errors.New(&quot;interval flag already set&quot;)</span></span><br><span class="line">	<span class="comment">//&#125;</span></span><br><span class="line">	<span class="keyword">for</span> _, dt := <span class="keyword">range</span> strings.Split(value, <span class="string">&quot;,&quot;</span>) &#123;</span><br><span class="line">		duration, err := time.ParseDuration(dt)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">		*i = <span class="built_in">append</span>(*i, duration)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">//flag.Xxx()，其中 Xxx 可以是 Int、String 等；返回一个相应类型的指针</span></span><br><span class="line">	wordPtr := flag.String(<span class="string">&quot;word&quot;</span>, <span class="string">&quot;test&quot;</span>, <span class="string">&quot;word&quot;</span>)</span><br><span class="line">	durtion := flag.Duration(<span class="string">&quot;duration&quot;</span>, time.Minute, <span class="string">&quot;set time duration&quot;</span>)</span><br><span class="line">	<span class="comment">//flag.XxxVar()，其中 XxxVar 可以是 Int、String 等；将 flag 绑定到一个变量上</span></span><br><span class="line">	<span class="keyword">var</span> svar <span class="type">string</span></span><br><span class="line">	flag.StringVar(&amp;svar, <span class="string">&quot;svar&quot;</span>, <span class="string">&quot;bar&quot;</span>, <span class="string">&quot;a string var&quot;</span>)</span><br><span class="line">	<span class="comment">//flag.Var解析自定义类型</span></span><br><span class="line">	<span class="keyword">var</span> i interval</span><br><span class="line">	flag.Var(&amp;i, <span class="string">&quot;interval&quot;</span>, <span class="string">&quot;解析url&quot;</span>)</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	flag.Parse()</span><br><span class="line">	fmt.Println(<span class="string">&quot;word:&quot;</span>, *wordPtr)</span><br><span class="line"></span><br><span class="line">	fmt.Println(<span class="string">&quot;stringval:&quot;</span>, svar)</span><br><span class="line">	fmt.Println(<span class="string">&quot;durtion:&quot;</span>, *durtion)</span><br><span class="line">	fmt.Println(<span class="string">&quot;custom:&quot;</span>, i)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"># flag.exe -word word -svar hello -duration 2h  -interval=1m,2m,3m -interval=1h</span></span><br><span class="line"><span class="comment">word: word</span></span><br><span class="line"><span class="comment">stringval: hello</span></span><br><span class="line"><span class="comment">durtion: 2h0m0s</span></span><br><span class="line"><span class="comment">custom: [1m0s 2m0s 3m0s 1h0m0s]</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>flagset 子命令方式</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;flag&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	sub := flag.NewFlagSet(<span class="string">&quot;sub1&quot;</span>, flag.ExitOnError)</span><br><span class="line">	intervals := sub.String(<span class="string">&quot;interval&quot;</span>, <span class="string">&quot;1m&quot;</span>, <span class="string">&quot;sub interval&quot;</span>)</span><br><span class="line">	nums := sub.Int(<span class="string">&quot;num&quot;</span>, <span class="number">3</span>, <span class="string">&quot;sub nums&quot;</span>)</span><br><span class="line">    <span class="comment">//bool 类型不使用=号就无法解析</span></span><br><span class="line">	bools := sub.Bool(<span class="string">&quot;bool&quot;</span>, <span class="literal">true</span>, <span class="string">&quot;sub nums&quot;</span>)</span><br><span class="line"></span><br><span class="line">	sub.Parse(os.Args[<span class="number">2</span>:])</span><br><span class="line">	fmt.Println(*intervals)</span><br><span class="line">	fmt.Println(*nums)</span><br><span class="line">	fmt.Println(*bools)</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"># sumcommand.exe sub1 -num 30 --interval=23 -bool false</span></span><br><span class="line"><span class="comment">23</span></span><br><span class="line"><span class="comment">30</span></span><br><span class="line"><span class="comment">true</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="pflag用法"><a href="#pflag用法" class="headerlink" title="pflag用法"></a>pflag用法</h1><pre><code>pflag是flag的增强版，兼容flag，同时有自己新增的一些特性。
+</code></pre>
+<p>pflag使用几种方式</p>
+<ol>
+<li>pflag.<Type> 类方法名会将标志参数值存储在指针中并返回。</li>
+<li>pflag.<Type>Var 类方法名中包含 Var 关键字的，会将标志参数值绑定到第一个指针类型的参数。</li>
+<li>pflag.<Type>P、pflag.<Type>VarP 类方法名以 P 结尾的，支持简短标志。<br>一个完整标志在命令行传参时使用的分界符为 –，而一个简短标志的分界符则为 -。</li>
+</ol>
+<h2 id="pflag中flag定义以及Value接口定义"><a href="#pflag中flag定义以及Value接口定义" class="headerlink" title="pflag中flag定义以及Value接口定义"></a>pflag中flag定义以及Value接口定义</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Flag <span class="keyword">struct</span> &#123;</span><br><span class="line">    Name                <span class="type">string</span> <span class="comment">// flag长选项的名称</span></span><br><span class="line">    Shorthand           <span class="type">string</span> <span class="comment">// flag短选项的名称，一个缩写的字符</span></span><br><span class="line">    Usage               <span class="type">string</span> <span class="comment">// flag的使用文本</span></span><br><span class="line">    Value               Value  <span class="comment">// flag的值</span></span><br><span class="line">    DefValue            <span class="type">string</span> <span class="comment">// flag的默认值</span></span><br><span class="line">    Changed             <span class="type">bool</span> <span class="comment">// 记录flag的值是否有被设置过</span></span><br><span class="line">    NoOptDefVal         <span class="type">string</span> <span class="comment">// 当flag出现在命令行，但是没有指定选项值时的默认值</span></span><br><span class="line">    Deprecated          <span class="type">string</span> <span class="comment">// 记录该flag是否被放弃</span></span><br><span class="line">    Hidden              <span class="type">bool</span> <span class="comment">// 如果值为true，则从help/usage输出信息中隐藏该flag</span></span><br><span class="line">    ShorthandDeprecated <span class="type">string</span> <span class="comment">// 如果flag的短选项被废弃，当使用flag的短选项时打印该信息</span></span><br><span class="line">    Annotations         <span class="keyword">map</span>[<span class="type">string</span>][]<span class="type">string</span> <span class="comment">// 给flag设置注解</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//不同于官方的Value接口，新增了一个Type方法</span></span><br><span class="line"><span class="keyword">type</span> Value <span class="keyword">interface</span> &#123;</span><br><span class="line">    String() <span class="type">string</span> <span class="comment">// 将flag类型的值转换为string类型的值，并返回string的内容</span></span><br><span class="line">    Set(<span class="type">string</span>) <span class="type">error</span> <span class="comment">// 将string类型的值转换为flag类型的值，转换失败报错</span></span><br><span class="line">    Type() <span class="type">string</span> <span class="comment">// 返回flag的类型，例如：string、int、ip等</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="pflag应用代码"><a href="#pflag应用代码" class="headerlink" title="pflag应用代码"></a>pflag应用代码</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;strings&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/spf13/pflag&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> intervals []time.Duration</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(i *intervals)</span></span> String() <span class="type">string</span> &#123;</span><br><span class="line">	<span class="keyword">return</span> fmt.Sprint(*i)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(i *intervals)</span></span> Set(value <span class="type">string</span>) <span class="type">error</span> &#123;</span><br><span class="line">	<span class="keyword">for</span> _, dt := <span class="keyword">range</span> strings.Split(value, <span class="string">&quot;,&quot;</span>) &#123;</span><br><span class="line">		duration, err := time.ParseDuration(dt)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">		*i = <span class="built_in">append</span>(*i, duration)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(i *intervals)</span></span> Type() <span class="type">string</span> &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="string">&quot;intervals&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line"></span><br><span class="line">	pflagxxx := pflag.String(<span class="string">&quot;pflagxxx&quot;</span>, <span class="string">&quot;pflagxxx&quot;</span>, <span class="string">&quot;string for args to return a string pointer&quot;</span>)</span><br><span class="line">	<span class="keyword">var</span> pflagxxxVar <span class="type">string</span></span><br><span class="line">	pflag.StringVar(&amp;pflagxxxVar, <span class="string">&quot;pflagxxxVar&quot;</span>, <span class="string">&quot;pflagxxxVar&quot;</span>, <span class="string">&quot;stringvar for args to var&quot;</span>)</span><br><span class="line"></span><br><span class="line">	pflagxxxP := pflag.StringP(<span class="string">&quot;pflagxxxP&quot;</span>, <span class="string">&quot;t&quot;</span>, <span class="string">&quot;pflagxxxP&quot;</span>, <span class="string">&quot;string for args to return a string pointer with shorthand&quot;</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> pflagxxxVarP <span class="type">string</span></span><br><span class="line">	pflag.StringVarP(&amp;pflagxxxVarP, <span class="string">&quot;pflagxxxVarP&quot;</span>, <span class="string">&quot;p&quot;</span>, <span class="string">&quot;pflagxxxVarP&quot;</span>, <span class="string">&quot;stringvar for args to var with shorthand&quot;</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> in intervals</span><br><span class="line">	pflag.Var(&amp;in, <span class="string">&quot;interval&quot;</span>, <span class="string">&quot;间隔&quot;</span>)</span><br><span class="line">	<span class="keyword">var</span> inp intervals</span><br><span class="line">	pflag.VarP(&amp;inp, <span class="string">&quot;intervalp&quot;</span>, <span class="string">&quot;i&quot;</span>, <span class="string">&quot;简短标志间隔&quot;</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">//如果标志具有 NoOptDefVal 属性并且在命令行上设置了标志而没有参数选项，则标志将设置为 NoOptDefVal 指定的值。</span></span><br><span class="line">	pflag.Lookup(<span class="string">&quot;interval&quot;</span>).NoOptDefVal = <span class="string">&quot;2m&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">//作用是禁止打印帮助信息时对标志进行重排序。</span></span><br><span class="line">	pflag.CommandLine.SortFlags = <span class="literal">false</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">//命令行解析</span></span><br><span class="line">	pflag.Parse()</span><br><span class="line"></span><br><span class="line">	fmt.Println(*pflagxxx)</span><br><span class="line">	fmt.Println(pflagxxxVar)</span><br><span class="line">	fmt.Println(*pflagxxxP)</span><br><span class="line">	fmt.Println(pflagxxxVarP)</span><br><span class="line">	fmt.Println(in)</span><br><span class="line">	fmt.Println(inp)</span><br><span class="line">    fmt.Printf(<span class="string">&quot;NFlag: %v\n&quot;</span>, pflag.NFlag()) <span class="comment">// 返回已设置的命令行标志个数</span></span><br><span class="line">    fmt.Printf(<span class="string">&quot;NArg: %v\n&quot;</span>, pflag.NArg())   <span class="comment">// 返回处理完标志后剩余的参数个数</span></span><br><span class="line">    fmt.Printf(<span class="string">&quot;Args: %v\n&quot;</span>, pflag.Args())   <span class="comment">// 返回处理完标志后剩余的参数列表</span></span><br><span class="line">    fmt.Printf(<span class="string">&quot;Arg(1): %v\n&quot;</span>, pflag.Arg(<span class="number">1</span>)) <span class="comment">// 返回处理完标志后剩余的参数列表中第 i 项</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">&gt;pflag.exe -h        </span></span><br><span class="line"><span class="comment">Usage of pflag.exe:</span></span><br><span class="line"><span class="comment">      --pflagxxx string           string for args to return a string pointer (default &quot;pflagxxx&quot;)</span></span><br><span class="line"><span class="comment">      --pflagxxxVar string        stringvar for args to var (default &quot;pflagxxxVar&quot;)</span></span><br><span class="line"><span class="comment">  -t, --pflagxxxP string          string for args to return a string pointer with shorthand (default &quot;pflagxxxP&quot;)</span></span><br><span class="line"><span class="comment">  -p, --pflagxxxVarP string       stringvar for args to var with shorthand (default &quot;pflagxxxVarP&quot;)</span></span><br><span class="line"><span class="comment">      --interval intervals[=2m]   间隔 (default [])</span></span><br><span class="line"><span class="comment">  -i, --intervalp intervals       简短标志间隔 (default [])</span></span><br><span class="line"><span class="comment">pflag: help requested</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">&gt;pflag.exe  --pflagxxx  &quot;a&quot;  --pflagxxxVar  &quot;b&quot; -t &quot;c&quot; -p &quot;d&quot; --interval  -i 4m,5m ada badc </span></span><br><span class="line"><span class="comment">a</span></span><br><span class="line"><span class="comment">b</span></span><br><span class="line"><span class="comment">c</span></span><br><span class="line"><span class="comment">d</span></span><br><span class="line"><span class="comment">[2m0s]</span></span><br><span class="line"><span class="comment">[4m0s 5m0s]</span></span><br><span class="line"><span class="comment">argument number is: 2</span></span><br><span class="line"><span class="comment">argument list is: [ada badc]</span></span><br><span class="line"><span class="comment">the first argument is: ada</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="viper用法"><a href="#viper用法" class="headerlink" title="viper用法"></a>viper用法</h1><p>Viper是Go应用程序现代化的、完整的解决方案，能够处理不同格式的配置文件，让我们在构建现代应用程序时，不必担心配置文件格式。Viper也能够满足我们对应用配置的各种需求。</p>
+<p>Viper可以从不同的位置读取配置，不同位置的配置具有不同的优先级，高优先级的配置会覆盖低优先级相同的配置，按优先级从高到低排列如下：</p>
+<ul>
+<li>通过viper.Set函数显示设置的配置</li>
+<li>命令行参数</li>
+<li>环境变量</li>
+<li>配置文件</li>
+<li>Key&#x2F;Value存储</li>
+<li>默认值</li>
+<li>这里需要注意，Viper配置键不区分大小写。</li>
+</ul>
+<p>Viper有很多功能，最重要的两类功能是读入配置和读取配置。<br><strong>读入配置</strong><br>读入配置，就是将配置读入到Viper中，有如下读入方式：</p>
+<ul>
+<li>设置默认的配置文件名。</li>
+<li>读取配置文件。</li>
+<li>监听和重新读取配置文件。</li>
+<li>从io.Reader读取配置。</li>
+<li>从环境变量读取。</li>
+<li>从命令行标志读取。</li>
+<li>从远程Key&#x2F;Value存储读取。</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;crypto/md5&quot;</span></span><br><span class="line">	<span class="string">&quot;encoding/hex&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/fsnotify/fsnotify&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/spf13/pflag&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/spf13/viper&quot;</span></span><br><span class="line">	_ <span class="string">&quot;github.com/spf13/viper/remote&quot;</span></span><br><span class="line">	<span class="string">&quot;io/ioutil&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> (</span><br><span class="line">	confMD5  <span class="type">string</span></span><br><span class="line">	username = pflag.StringP(<span class="string">&quot;username&quot;</span>, <span class="string">&quot;u&quot;</span>, <span class="string">&quot;pflag-username&quot;</span>, <span class="string">&quot;help message for username&quot;</span>)</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	pflag.Parse()</span><br><span class="line">	<span class="comment">//优先级高到低</span></span><br><span class="line">    <span class="comment">//1. viper.Set 优先级最高</span></span><br><span class="line">	<span class="comment">//viper.Set(&quot;projectbase&quot;, &quot;highPro&quot;) 6</span></span><br><span class="line">	<span class="comment">//2. 从命令行获取配置 5</span></span><br><span class="line">	<span class="comment">//viper.BindPFlag(&quot;projectbase&quot;, pflag.Lookup(&quot;username&quot;))</span></span><br><span class="line">	<span class="comment">//3. 绑定环境变量 4</span></span><br><span class="line">	<span class="comment">//viper.BindEnv(&quot;projectbase&quot;, &quot;projectbase&quot;)</span></span><br><span class="line">	<span class="comment">//4. 配置文件写入 3 </span></span><br><span class="line">	<span class="comment">//5. key/value存储 远程 2</span></span><br><span class="line">	viper.AddRemoteProvider(<span class="string">&quot;consul&quot;</span>, <span class="string">&quot;172.20.6.37:8500&quot;</span>, <span class="string">&quot;user&quot;</span>) <span class="comment">// 连接远程 consul 服务</span></span><br><span class="line">	viper.SetConfigType(<span class="string">&quot;YAML&quot;</span>) <span class="comment">// 显式设置文件格式文 YAML</span></span><br><span class="line">	<span class="keyword">if</span> err := viper.ReadRemoteConfig(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;-=============%s&quot;</span>, err.Error())</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//6. 设置默认值 1</span></span><br><span class="line">	viper.SetDefault(<span class="string">&quot;projectbase&quot;</span>, <span class="string">&quot;prevalue&quot;</span>)</span><br><span class="line"></span><br><span class="line">	fmt.Printf(<span class="string">&quot;+++++%v\n&quot;</span>, viper.Get(<span class="string">&quot;projectbase&quot;</span>))</span><br><span class="line">	<span class="comment">//配置写入</span></span><br><span class="line">	<span class="comment">//viper.SetConfigFile(&quot;top.yaml&quot;)</span></span><br><span class="line">	<span class="comment">//if err := viper.ReadInConfig(); err != nil &#123;</span></span><br><span class="line">	<span class="comment">//	fmt.Errorf(&quot;%s&quot;, err.Error())</span></span><br><span class="line">	<span class="comment">//&#125;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">//热加载,解决多次调用OnConfigChange问题</span></span><br><span class="line">	viper.OnConfigChange(<span class="function"><span class="keyword">func</span><span class="params">(e fsnotify.Event)</span></span> &#123;</span><br><span class="line">		tconfMD5, _ := ReadFileMd5(<span class="string">&quot;top.yaml&quot;</span>)</span><br><span class="line">		fmt.Printf(<span class="string">&quot;[%+v]\n&quot;</span>, tconfMD5)</span><br><span class="line">		<span class="keyword">if</span> tconfMD5 == confMD5 &#123;</span><br><span class="line">			<span class="keyword">return</span></span><br><span class="line">		&#125;</span><br><span class="line">		confMD5 = tconfMD5</span><br><span class="line">		fmt.Println(<span class="string">&quot;cfg start....&quot;</span>, e.String(), e.Name)</span><br><span class="line"></span><br><span class="line">	&#125;)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 监控并重新读取配置文件，需要确保在调用前添加了所有的配置路径</span></span><br><span class="line">	viper.WatchConfig()</span><br><span class="line"></span><br><span class="line">	<span class="comment">//反序列化 常用</span></span><br><span class="line">	<span class="keyword">var</span> topcfg TopCfg</span><br><span class="line">	err := viper.Unmarshal(&amp;topcfg)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;%+v\n&quot;</span>, topcfg)</span><br><span class="line">	fmt.Printf(<span class="string">&quot;%#v\n===&quot;</span>, topcfg)</span><br><span class="line"></span><br><span class="line">	<span class="comment">//从viper中读取配置</span></span><br><span class="line">	<span class="keyword">if</span> keys := viper.AllKeys(); <span class="built_in">len</span>(keys) &gt; <span class="number">0</span> &#123;</span><br><span class="line">		<span class="keyword">for</span> _, key := <span class="keyword">range</span> keys &#123;</span><br><span class="line">			fmt.Printf(<span class="string">&quot;%s:%v\n&quot;</span>, key, viper.Get(key))</span><br><span class="line"></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//提取字树</span></span><br><span class="line">	grpcCfg := viper.Sub(<span class="string">&quot;grpc&quot;</span>)</span><br><span class="line">	fmt.Printf(<span class="string">&quot;%v\n&quot;</span>, grpcCfg.AllKeys())</span><br><span class="line">	fmt.Printf(<span class="string">&quot;%v\n&quot;</span>, grpcCfg.Get(<span class="string">&quot;username&quot;</span>))</span><br><span class="line">	<span class="comment">//访问嵌套的键</span></span><br><span class="line">	fmt.Printf(<span class="string">&quot;%v\n&quot;</span>, viper.Get(<span class="string">&quot;grpc.username&quot;</span>))</span><br><span class="line"></span><br><span class="line">    <span class="comment">//序列化</span></span><br><span class="line">	viper.WriteConfigAs(<span class="string">&quot;new.yaml&quot;</span>)</span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		time.Sleep(<span class="number">3</span> * time.Second)</span><br><span class="line">		fmt.Printf(<span class="string">&quot;%v\n&quot;</span>, viper.Get(<span class="string">&quot;projectbase&quot;</span>))</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ReadFileMd5</span><span class="params">(sfile <span class="type">string</span>)</span></span> (<span class="type">string</span>, <span class="type">error</span>) &#123;</span><br><span class="line">	ssconfig, err := ioutil.ReadFile(sfile)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="string">&quot;&quot;</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> GetMD5(ssconfig), <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetMD5</span><span class="params">(s []<span class="type">byte</span>)</span></span> <span class="type">string</span> &#123;</span><br><span class="line">	m := md5.New()</span><br><span class="line">	m.Write([]<span class="type">byte</span>(s))</span><br><span class="line">	<span class="keyword">return</span> hex.EncodeToString(m.Sum(<span class="literal">nil</span>))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="corba用法"><a href="#corba用法" class="headerlink" title="corba用法"></a>corba用法</h1><p>Cobra 是一个 Go 语言开发的命令行（CLI）框架，它提供了简洁、灵活且强大的方式来创建命令行程序。它包含一个用于创建命令行程序的库（Cobra 库），以及一个用于快速生成基于 Cobra 库的命令行程序工具（Cobra 命令）。Cobra 是由 Go 团队成员 spf13 为 Hugo 项目创建的，并已被许多流行的 Go 项目所采用，如 Kubernetes、Helm、Docker (distribution)、Etcd 等。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/csdnzxm/article/details/108945965">Go - flag：命令行flags解析</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/620649810">Go 命令行参数解析工具 pflag 使用</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/624901218?utm_id=0">在 Go 中如何使用 Viper 来管理配置</a><br><a target="_blank" rel="noopener" href="https://jianghushinian.cn/2023/05/08/go-modern-command-line-framework-cobra-details/">Go 语言现代命令行框架 Cobra 详解</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/go/" rel="tag"># go</a>
+              <a href="/tags/cli/" rel="tag"># cli</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/blog/2023/10/2023-10-08-channel%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95.html" rel="prev" title="channel基础用法">
+      <i class="fa fa-chevron-left"></i> channel基础用法
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/blog/2023/10/2023-10-24-opentelmetry%E4%BD%BF%E7%94%A8-md.html" rel="next" title="opentelmetry使用.md">
+      opentelmetry使用.md <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#flag%E7%94%A8%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">flag用法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#pflag%E7%94%A8%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">pflag用法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#pflag%E4%B8%ADflag%E5%AE%9A%E4%B9%89%E4%BB%A5%E5%8F%8AValue%E6%8E%A5%E5%8F%A3%E5%AE%9A%E4%B9%89"><span class="nav-number">2.1.</span> <span class="nav-text">pflag中flag定义以及Value接口定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pflag%E5%BA%94%E7%94%A8%E4%BB%A3%E7%A0%81"><span class="nav-number">2.2.</span> <span class="nav-text">pflag应用代码</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#viper%E7%94%A8%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">viper用法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#corba%E7%94%A8%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">corba用法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">bmb</p>
+  <div class="site-description" itemprop="description">虚实无常</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bmb</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">10k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">9 分钟</span>
+</div>
+  <div class="powered-by">bmb
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/haru01.model.json"},"display":{"position":"left","width":250,"height":400},"mobile":{"show":false}});</script></body>
+</html>
