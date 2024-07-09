@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"bmbbms.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="虚实无常">
+  <meta name="description" content="获取启动时间大于68400秒的pod(uat)kubectl get pods –all-namespaces -o json | jq -r ‘.items[] | select((.status.phase&#x3D;&#x3D;”Running”) and (.status.startTime !&#x3D; null) and ((now - (.status.startTime|from">
 <meta property="og:type" content="article">
 <meta property="og:title" content="test">
 <meta property="og:url" content="https://bmbbms.github.io/blog/2024/01/test.html">
 <meta property="og:site_name" content="bmb">
-<meta property="og:description" content="虚实无常">
+<meta property="og:description" content="获取启动时间大于68400秒的pod(uat)kubectl get pods –all-namespaces -o json | jq -r ‘.items[] | select((.status.phase&#x3D;&#x3D;”Running”) and (.status.startTime !&#x3D; null) and ((now - (.status.startTime|from">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-01-08T08:41:52.000Z">
-<meta property="article:modified_time" content="2024-01-08T08:41:52.247Z">
+<meta property="article:modified_time" content="2024-05-16T01:05:00.939Z">
 <meta property="article:author" content="bmb">
 <meta name="twitter:card" content="summary">
 
@@ -191,6 +191,13 @@
 
               <time title="创建时间：2024-01-08 16:41:52" itemprop="dateCreated datePublished" datetime="2024-01-08T16:41:52+08:00">2024-01-08</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-05-16 09:05:00" itemprop="dateModified" datetime="2024-05-16T09:05:00+08:00">2024-05-16</time>
+              </span>
 
           
             <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
@@ -205,14 +212,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>0</span>
+              <span>1.7k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -224,7 +231,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        
+        <h1 id="获取启动时间大于68400秒的pod-uat"><a href="#获取启动时间大于68400秒的pod-uat" class="headerlink" title="获取启动时间大于68400秒的pod(uat)"></a>获取启动时间大于68400秒的pod(uat)</h1><p>kubectl get pods –all-namespaces -o json | jq -r ‘.items[] | select((.status.phase&#x3D;&#x3D;”Running”) and (.status.startTime !&#x3D; null) and ((now - (.status.startTime|fromdateiso8601)) &gt; 68400)) |”kubectl delete po -n (.metadata.namespace) (.metadata.name) –force –grace-period&#x3D;0”‘  |grep -E “account|agent|auth|base|clear|clearing|deduct|default|dingjia|finance|loan|login|manage|marketing|merch|message|mpos|open-platform|openapi|order|order-idc-uat|payment|posp|product|qrcode|qrcode-idc-uat|refund|relmsg|riskctrl|setting|trans|utils|xdata”  &gt; restart.sh</p>
+<p>cat restart.sh |grep -vE “cert-manager|opentelemetry-operator-system|flink-session-cluster|monitoring|kube-system|cert-manager|ingress-nginx”</p>
+<h1 id="访问https-node-exporter"><a href="#访问https-node-exporter" class="headerlink" title="访问https node-exporter"></a>访问https node-exporter</h1><p>curl -H “Authorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6InIzQXdnX1o4TnUxcGw1NUdSY0tYUS11eGMzRnZYRzQycU5RUTBhR1NDLUkifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJtb25pdG9yaW5nIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6Im5vZGUtZXhwb3J0ZXItdG9rZW4tNXBic2wiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoibm9kZS1leHBvcnRlciIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjE1YTUxMDI1LTc0ZGItNDk2ZS05NGJjLWZiNGI1ZGNkZGI0MyIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDptb25pdG9yaW5nOm5vZGUtZXhwb3J0ZXIifQ.P8lHP_W8siXBMu3jyB0ouYKBGoDQvRFsR0s7nw0rQKr2Vkp4q8D-cvmNlATtp34p8QlTemzim3q4CI-L_t-8SHZgFGL5R744SjGTD8s6iTYNymbIxsZNPRBqQTxM7ZpReX_-MeBz2F7zlzDAK7CAvo1-Rh_JyKPimbokUyNujVMwHmXEEN51ocSaqYBR6qmcyZ0LE4y5-o9XD6Jj393bZso840chiHTYprC082xREajNkptN-OkI_I8iPxgrD2L5LrECOBDayh7frwkZbrml5nd2b6iT1udJQiMqWYGhhEMWuBV7Sv4F8vT-IivQ1MRIRFtmVoU3GMM36subP-E2dw” <a target="_blank" rel="noopener" href="https://10.3.16.27:9100/metrics">https://10.3.16.27:9100/metrics</a> –cacert ca.crt  -k</p>
+
     </div>
 
     
@@ -242,7 +252,10 @@
     <a href="/blog/2023/11/2023-11-15-influxdb%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95.html" rel="prev" title="influxdb基本语法">
       <i class="fa fa-chevron-left"></i> influxdb基本语法
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/blog/2024/02/apisix%E7%94%9F%E4%BA%A7%E9%83%A8%E7%BD%B2.html" rel="next" title="apisix生产部署">
+      apisix生产部署 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -301,6 +314,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%90%AF%E5%8A%A8%E6%97%B6%E9%97%B4%E5%A4%A7%E4%BA%8E68400%E7%A7%92%E7%9A%84pod-uat"><span class="nav-number">1.</span> <span class="nav-text">获取启动时间大于68400秒的pod(uat)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%BF%E9%97%AEhttps-node-exporter"><span class="nav-number">2.</span> <span class="nav-text">访问https node-exporter</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -314,7 +328,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-count">10</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -363,12 +377,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">10k</span>
+    <span title="站点总字数">18k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">9 分钟</span>
+    <span title="站点阅读时长">16 分钟</span>
 </div>
   <div class="powered-by">bmb
   </div>

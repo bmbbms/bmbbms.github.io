@@ -163,6 +163,354 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bmbbms.github.io/blog/2024/07/%E5%B0%8F%E7%B1%B3%E8%B7%AF%E7%94%B1%E5%99%A8%E5%BC%80%E5%90%AFssh%E5%92%8C%E5%A4%96%E7%BD%91%E8%AE%BF%E9%97%AE-md.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="bmb">
+      <meta itemprop="description" content="虚实无常">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="bmb">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2024/07/%E5%B0%8F%E7%B1%B3%E8%B7%AF%E7%94%B1%E5%99%A8%E5%BC%80%E5%90%AFssh%E5%92%8C%E5%A4%96%E7%BD%91%E8%AE%BF%E9%97%AE-md.html" class="post-title-link" itemprop="url">小米路由器开启ssh和外网访问.md</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-07-05 14:12:36 / 修改时间：14:38:41" itemprop="dateCreated datePublished" datetime="2024-07-05T14:12:36+08:00">2024-07-05</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="基础信息"><a href="#基础信息" class="headerlink" title="基础信息"></a>基础信息</h1><ul>
+<li>型号: 小米路由器4A千兆版	</li>
+<li>系统ROM版本: MiWiFi 稳定版 2.30.500</li>
+</ul>
+<p>	</p>
+<h1 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h1><p><a target="_blank" rel="noopener" href="https://github.com/acecilia/OpenWRTInvasion/pull/155#issuecomment-2043692983">操作机器ip要小</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 找一台内网机器能运行python3</span></span><br><span class="line">ssh 192.168.31.4(nas虚拟机)</span><br><span class="line">git <span class="built_in">clone</span> https://github.com/passerma/OpenWRTInvasion</span><br><span class="line"><span class="built_in">cd</span> OpenWRTInvasion</span><br><span class="line">pip3 install -r requirements.txt <span class="comment"># Install requirements</span></span><br><span class="line">python3 remote_command_execution_vulnerability.py <span class="comment"># Run the script</span></span><br><span class="line"><span class="comment"># 2. 输入路由器ip和登录密码获取到stok，稍等一会儿就能执行telnet了</span></span><br><span class="line">telnet 192.168.31.1</span><br><span class="line"></span><br><span class="line"><span class="comment"># 默认用户名密码为root/root,登录后建议修改</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 修改miwificonfig文件，使得外网可以访问web界面</span></span><br><span class="line">vim /etc/nginx/miwifi-webinitrd.conf</span><br><span class="line"><span class="comment"># 在  set $finalvar &quot;$canproxy $isluci&quot;;  前面添加 set $isluci &quot;1&quot;;</span></span><br><span class="line">    <span class="built_in">set</span> <span class="variable">$isluci</span> <span class="string">&quot;1&quot;</span>;                                                                      </span><br><span class="line">    <span class="built_in">set</span> <span class="variable">$finalvar</span> <span class="string">&quot;<span class="variable">$canproxy</span> <span class="variable">$isluci</span>&quot;</span>;   </span><br><span class="line"><span class="comment"># 4. 重新加载配置 </span></span><br><span class="line">nginx -s reload</span><br><span class="line"><span class="comment"># 5.修改防火墙规则暴露ssh端口和web端口</span></span><br><span class="line">vim /etc/config/firewall</span><br><span class="line"><span class="comment"># 6. 添加 ssh 和web端口转发</span></span><br><span class="line">config redirect <span class="string">&#x27;MIWEB&#x27;</span></span><br><span class="line">        option src <span class="string">&#x27;wan&#x27;</span></span><br><span class="line">        option src_dport <span class="string">&#x27;1314&#x27;</span></span><br><span class="line">        option dest_ip <span class="string">&#x27;192.168.31.1&#x27;</span></span><br><span class="line">        option name <span class="string">&#x27;WEB&#x27;</span>    </span><br><span class="line">        option ftype <span class="string">&#x27;1&#x27;</span>      </span><br><span class="line">        option dest_port <span class="string">&#x27;80&#x27;</span>  </span><br><span class="line">        option proto <span class="string">&#x27;tcp&#x27;</span></span><br><span class="line">           </span><br><span class="line">config redirect <span class="string">&#x27;MISSH&#x27;</span>  </span><br><span class="line">        option src <span class="string">&#x27;wan&#x27;</span>  </span><br><span class="line">        option src_dport <span class="string">&#x27;13142&#x27;</span></span><br><span class="line">        option dest_ip <span class="string">&#x27;192.168.31.1&#x27;</span></span><br><span class="line">        option name <span class="string">&#x27;ssh&#x27;</span>     </span><br><span class="line">        option ftype <span class="string">&#x27;1&#x27;</span>       </span><br><span class="line">        option dest_port <span class="string">&#x27;22&#x27;</span></span><br><span class="line">        option proto <span class="string">&#x27;tcp&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 7. 重启防火墙</span></span><br><span class="line">/etc/init.d/firewall restart</span><br><span class="line"><span class="comment"># 8. 如果路由器上方还有光猫,则需要配置端口转发到路由器lan口对应端口上。</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bmbbms.github.io/blog/2024/07/dns%E6%B5%8B%E8%AF%95%E8%84%9A%E6%9C%AC.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="bmb">
+      <meta itemprop="description" content="虚实无常">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="bmb">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2024/07/dns%E6%B5%8B%E8%AF%95%E8%84%9A%E6%9C%AC.html" class="post-title-link" itemprop="url">dns测试脚本</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-07-02 15:55:12 / 修改时间：15:55:44" itemprop="dateCreated datePublished" datetime="2024-07-02T15:55:12+08:00">2024-07-02</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>250</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">var=1</span><br><span class="line"><span class="keyword">while</span> <span class="literal">true</span> ; <span class="keyword">do</span></span><br><span class="line">  res=$( &#123; curl -o /dev/null -s -w %&#123;time_namelookup&#125;\\n  http://crypto-hsm-svc.utils:8080; &#125; 2&gt;&amp;1 )</span><br><span class="line">  var=$((var+<span class="number">1</span>))</span><br><span class="line">  <span class="keyword">if</span> [[ <span class="variable">$res</span> =~ ^[1-9] ]]; <span class="keyword">then</span></span><br><span class="line">    now=$(<span class="built_in">date</span> +<span class="string">&quot;%T&quot;</span>)</span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;<span class="variable">$var</span> slow: <span class="variable">$res</span> <span class="variable">$now</span>&quot;</span></span><br><span class="line">    <span class="built_in">break</span></span><br><span class="line">  <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bmbbms.github.io/blog/2024/03/python3-10%E5%AE%89%E8%A3%85-md.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="bmb">
+      <meta itemprop="description" content="虚实无常">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="bmb">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2024/03/python3-10%E5%AE%89%E8%A3%85-md.html" class="post-title-link" itemprop="url">python3.10安装.md</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-03-08 14:20:07" itemprop="dateCreated datePublished" datetime="2024-03-08T14:20:07+08:00">2024-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-05-16 09:05:02" itemprop="dateModified" datetime="2024-05-16T09:05:02+08:00">2024-05-16</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p> mkdir &#x2F;usr&#x2F;local&#x2F;openssl<br> .&#x2F;config –prefix&#x3D;&#x2F;usr&#x2F;local&#x2F;openssl<br>  make -j 8 &amp;&amp; make install<br>    ln -s &#x2F;usr&#x2F;local&#x2F;openssl&#x2F;bin&#x2F;openssl &#x2F;usr&#x2F;bin&#x2F;openssl<br>    cd &#x2F;usr&#x2F;local&#x2F;openssl<br>    ldd &#x2F;usr&#x2F;local&#x2F;openssl&#x2F;bin&#x2F;openssl<br> vim &#x2F;etc&#x2F;ld.so.conf<br> 追加：<br> &#x2F;usr&#x2F;local&#x2F;openssl&#x2F;lib</p>
+<p> ldconfig &#x2F;etc&#x2F;ld.so.conf<br> openssl version</p>
+<p>yum -y install gcc make zlib zlib-devel libffi libffi-devel readline-devel openssl-devel openssl11 openssl11-devel</p>
+<p>wget <a target="_blank" rel="noopener" href="https://www.python.org/ftp/python/3.10.13/Python-3.10.13.tgz">https://www.python.org/ftp/python/3.10.13/Python-3.10.13.tgz</a><br>tar -xzvf Python-3.10.13.tgz<br>cd Python-3.10.13&#x2F;</p>
+<p>export CFLAGS&#x3D;$(pkg-config –cflags openssl11)<br>export LDFLAGS&#x3D;$(pkg-config –libs openssl11)</p>
+<p> .&#x2F;configure –prefix&#x3D;&#x2F;usr&#x2F;local&#x2F;python3 –with-ssl<br>  make -j 8 &amp;&amp; make install</p>
+<p>  mv  &#x2F;usr&#x2F;bin&#x2F;python &#x2F;usr&#x2F;bin&#x2F;python2<br>  ln -s &#x2F;usr&#x2F;local&#x2F;python3&#x2F;bin&#x2F;python3 &#x2F;usr&#x2F;bin&#x2F;python3<br>  ln -s &#x2F;usr&#x2F;local&#x2F;python3&#x2F;bin&#x2F;pip3 &#x2F;usr&#x2F;bin&#x2F;pip3<br>  ln -s &#x2F;usr&#x2F;bin&#x2F;pip &#x2F;usr&#x2F;bin&#x2F;pip3</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://bmbbms.github.io/blog/2024/02/apisix%E7%94%9F%E4%BA%A7%E9%83%A8%E7%BD%B2.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="bmb">
+      <meta itemprop="description" content="虚实无常">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="bmb">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2024/02/apisix%E7%94%9F%E4%BA%A7%E9%83%A8%E7%BD%B2.html" class="post-title-link" itemprop="url">apisix生产部署</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-02-19 13:36:58" itemprop="dateCreated datePublished" datetime="2024-02-19T13:36:58+08:00">2024-02-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-02-28 16:21:53" itemprop="dateModified" datetime="2024-02-28T16:21:53+08:00">2024-02-28</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="1-apisix-架构图"><a href="#1-apisix-架构图" class="headerlink" title="1. apisix 架构图"></a>1. apisix 架构图</h1><ul>
+<li><strong>apisix-gateway</strong>. 网关入口，接入外部流量</li>
+<li><strong>apisix-dashboard</strong>. 管理api接口</li>
+<li><strong>etcd</strong>. apisix后端存储</li>
+<li><strong>apisix-ingress</strong>. 类似于k8s ingress，不同的是，实际的流量承载还是在apisix-gateway</li>
+</ul>
+<h1 id="2-核心组件部署"><a href="#2-核心组件部署" class="headerlink" title="2.核心组件部署"></a>2.核心组件部署</h1><h2 id="2-1-etcd部署-无证书版"><a href="#2-1-etcd部署-无证书版" class="headerlink" title="2.1 etcd部署(无证书版)"></a>2.1 etcd部署(无证书版)</h2><p>当前部署版本 </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">etcd Version: 3.5.10</span><br><span class="line">Git SHA: 0223ca52b</span><br><span class="line">Go Version: go1.20.10</span><br><span class="line">Go OS/Arch: linux/amd64</span><br></pre></td></tr></table></figure>
+<p><strong>由于使用带证书版，apisix本身兼容性有些问题，暂时使用无证书版本</strong>,部署采用ansible脚本部署,先下载 deployetcd.zip</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 在有ansible节点上执行</span></span><br><span class="line"><span class="built_in">mkdir</span> -p /data/deployetcd &amp;&amp; <span class="built_in">mv</span> deployetcd.zip /data/deployetcd</span><br><span class="line"><span class="built_in">cd</span> /data/deployetcd &amp;&amp; unzip deployetcd.zip &amp;&amp; <span class="built_in">rm</span> -f deployetcd.zip</span><br><span class="line"><span class="comment"># 修改hosts里面关于etcd节点ip的配置</span></span><br><span class="line">ansible-playbook -i hosts-lg playbooks/etcd-nocert.yml</span><br></pre></td></tr></table></figure>
+
+<p><strong>host-lg</strong> 代表对应etcd集群的配置文件，一定要填写正确</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#etcd其他命令</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 清理etcd集群</span></span><br><span class="line">ansible-playbook -i hosts-lg playbooks/etcd-clean.yml</span><br><span class="line"><span class="comment"># 添加etcd节点</span></span><br><span class="line">./ezetcd add-etcd hosts-lg <span class="variable">$ip</span></span><br><span class="line"><span class="comment"># 删除etcd节点</span></span><br><span class="line">./ezetcd del-etcd hosts-lg <span class="variable">$ip</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 备份etcd集群 (已经在控制节点添加了crontab 任务)</span></span><br><span class="line">./ezetcd backup hosts-lg</span><br><span class="line"><span class="comment"># 备份恢复</span></span><br><span class="line">./ezetcd restore hosts-lg</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+<h2 id="2-2-apisix-gateway-apisix-ingress-apisix-dashboard部署-先下载-apisix-1-11-0-zip"><a href="#2-2-apisix-gateway-apisix-ingress-apisix-dashboard部署-先下载-apisix-1-11-0-zip" class="headerlink" title="2.2 apisix-gateway apisix-ingress apisix-dashboard部署 先下载 apisix-1.11.0.zip"></a>2.2 apisix-gateway apisix-ingress apisix-dashboard部署 先下载 apisix-1.11.0.zip</h2><ul>
+<li><p>1.下载apisix-helm包</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> /data/apisix &amp;&amp; <span class="built_in">mv</span> apisix-1.11.0.zip  /data/apisix/</span><br><span class="line">unzip  apisix-1.11.0.zip &amp;&amp; <span class="built_in">rm</span> -f <span class="built_in">mv</span> apisix-1.11.0.zip </span><br></pre></td></tr></table></figure></li>
+<li><p>2.修改values-add.yaml</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apisix:</span></span><br><span class="line">  <span class="attr">enabled:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">image:</span></span><br><span class="line">    <span class="attr">repository:</span> <span class="string">registry.jlpay.io/posp-prod/apisix-plugs-feature/1035072</span></span><br><span class="line">    <span class="attr">pullPolicy:</span> <span class="string">IfNotPresent</span></span><br><span class="line">    <span class="attr">tag:</span> <span class="number">276782</span><span class="string">-c417d7c2</span></span><br><span class="line">  <span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line">  <span class="attr">replicaCount:</span> <span class="number">3</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">podAnnotations:</span> </span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">  <span class="attr">hostNetwork:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">nodeSelector:</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line">  <span class="attr">timezone:</span> <span class="string">&quot;Asia/Shanghai&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 和开发相关</span></span><br><span class="line">  <span class="attr">enableCustomizedConfig:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">customizedConfig:</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="attr">admin:</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">credentials:</span></span><br><span class="line">    <span class="attr">admin:</span> <span class="string">edd1c9f034335f136f87ad84b625c8f1</span></span><br><span class="line">    <span class="attr">viewer:</span> <span class="string">4054f7cf07e344346cd3f287985e76a2</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="attr">nginx:</span></span><br><span class="line">  <span class="attr">workerRlimitNofile:</span> <span class="string">&quot;20480&quot;</span></span><br><span class="line">  <span class="attr">workerConnections:</span> <span class="string">&quot;10620&quot;</span></span><br><span class="line">  <span class="attr">workerProcesses:</span> <span class="string">auto</span></span><br><span class="line">  <span class="attr">enableCPUAffinity:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">meta:</span> <span class="string">|</span></span><br><span class="line"><span class="string">    lua_shared_dict:</span></span><br><span class="line"><span class="string">      prometheus-metrics: 15m</span></span><br><span class="line"><span class="string"></span><span class="comment"># 和开发相关</span></span><br><span class="line"><span class="attr">plugins:</span> []</span><br><span class="line"><span class="comment"># 和开发相关</span></span><br><span class="line"><span class="attr">pluginAttrs:</span> &#123;&#125;</span><br><span class="line"><span class="comment"># 和开发相关</span></span><br><span class="line"><span class="attr">extPlugin:</span></span><br><span class="line">  <span class="attr">enabled:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">cmd:</span> [<span class="string">&quot;/path/to/apisix-plugin-runner/runner&quot;</span>, <span class="string">&quot;run&quot;</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 和开发相关</span></span><br><span class="line"><span class="attr">customPlugins:</span></span><br><span class="line">  <span class="attr">enabled:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">luaPath:</span> <span class="string">&quot;/opts/custom_plugins/?.lua&quot;</span></span><br><span class="line">  <span class="attr">plugins:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">&quot;plugin-name&quot;</span></span><br><span class="line">      <span class="attr">attrs:</span> &#123;&#125;</span><br><span class="line">      <span class="attr">configMap:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">&quot;configmap-name&quot;</span></span><br><span class="line">        <span class="attr">mounts:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="attr">key:</span> <span class="string">&quot;the-file-name&quot;</span></span><br><span class="line">            <span class="attr">path:</span> <span class="string">&quot;mount-path&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="attr">extraInitContainers:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">init-sysctl</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">registry.jlpay.io/middleware/busybox:1.28</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="attr">initContainer:</span></span><br><span class="line">  <span class="attr">image:</span> <span class="string">registry.jlpay.io/middleware/busybox</span></span><br><span class="line">  <span class="attr">tag:</span> <span class="number">1.28</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># etcd相关配置</span></span><br><span class="line"><span class="attr">etcd:</span></span><br><span class="line"><span class="comment"># 不启用k8s部署etcd集群</span></span><br><span class="line">  <span class="attr">enabled:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">host:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">http://172.20.20.39:2379</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">http://172.20.20.37:2379</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">http://172.20.20.38:2379</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">prefix:</span> <span class="string">&quot;/apisix&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="attr">service:</span></span><br><span class="line">    <span class="attr">port:</span> <span class="number">2379</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="attr">dashboard:</span></span><br><span class="line">  <span class="attr">image:</span></span><br><span class="line">    <span class="attr">repository:</span> <span class="string">&quot;registry.jlpay.io/middleware/apisix-dashboard&quot;</span></span><br><span class="line">  <span class="attr">enabled:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">config:</span></span><br><span class="line">    <span class="attr">conf:</span></span><br><span class="line">      <span class="attr">etcd:</span></span><br><span class="line">        <span class="attr">endpoints:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="string">http://172.20.20.39:2379</span></span><br><span class="line">          <span class="bullet">-</span> <span class="string">http://172.20.20.37:2379</span></span><br><span class="line">          <span class="bullet">-</span> <span class="string">http://172.20.20.38:2379</span></span><br><span class="line"></span><br><span class="line">        <span class="attr">prefix:</span> <span class="string">&quot;/apisix&quot;</span>     </span><br><span class="line">  <span class="attr">service:</span></span><br><span class="line">    <span class="attr">type:</span> <span class="string">NodePort</span></span><br><span class="line"></span><br><span class="line">          </span><br><span class="line"></span><br><span class="line"><span class="comment"># ingress-controller相关</span></span><br><span class="line"><span class="attr">ingress-controller:</span></span><br><span class="line">  <span class="attr">initContainer:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">registry.jlpay.io/middleware/busybox</span></span><br><span class="line">  <span class="attr">image:</span></span><br><span class="line">    <span class="attr">repository:</span> <span class="string">registry.jlpay.io/middleware/apisix-ingress-controller</span></span><br><span class="line">    <span class="attr">pullPolicy:</span> <span class="string">IfNotPresent</span></span><br><span class="line">    <span class="attr">tag:</span> <span class="string">&quot;1.8.0&quot;</span></span><br><span class="line">  <span class="attr">enabled:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">config:</span></span><br><span class="line">    <span class="attr">apisix:</span></span><br><span class="line">      <span class="attr">adminAPIVersion:</span> <span class="string">&quot;v3&quot;</span></span><br><span class="line">  <span class="attr">config:</span></span><br><span class="line">    <span class="attr">kubernetes:</span></span><br><span class="line">      <span class="attr">ingressVersion:</span> <span class="string">&quot;networking/v1beta1&quot;</span></span><br><span class="line">    <span class="attr">apisix:</span></span><br><span class="line">    <span class="comment">#和apisix部署的命名空间对应</span></span><br><span class="line">      <span class="attr">serviceNamespace:</span> <span class="string">apisix</span></span><br><span class="line">      <span class="attr">servicePort:</span> <span class="number">9180</span></span><br><span class="line">      <span class="attr">adminKey:</span> <span class="string">&quot;edd1c9f034335f136f87ad84b625c8f1&quot;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+</li>
+<li><ol start="3">
+<li>部署<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">helm create ns apisix</span><br><span class="line">helm install  -n apisix apisix -f values-add.yaml .</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ul>
+<h1 id="3-可观测性对接"><a href="#3-可观测性对接" class="headerlink" title="3.可观测性对接"></a>3.可观测性对接</h1><h2 id="3-1-对接prometheus"><a href="#3-1-对接prometheus" class="headerlink" title="3.1 对接prometheus"></a>3.1 对接prometheus</h2><h2 id="3-2-对接opentelemetry"><a href="#3-2-对接opentelemetry" class="headerlink" title="3.2 对接opentelemetry"></a>3.2 对接opentelemetry</h2><h2 id="3-3-对接es日志"><a href="#3-3-对接es日志" class="headerlink" title="3.3 对接es日志"></a>3.3 对接es日志</h2><h1 id="4-需要确定的点"><a href="#4-需要确定的点" class="headerlink" title="4.需要确定的点"></a>4.需要确定的点</h1><ul>
+<li></li>
+<li></li>
+<li></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://bmbbms.github.io/blog/2024/01/test.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -189,6 +537,13 @@
 
               <time title="创建时间：2024-01-08 16:41:52" itemprop="dateCreated datePublished" datetime="2024-01-08T16:41:52+08:00">2024-01-08</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-05-16 09:05:00" itemprop="dateModified" datetime="2024-05-16T09:05:00+08:00">2024-05-16</time>
+              </span>
 
           <br>
             <span class="post-meta-item" title="本文字数">
@@ -196,14 +551,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>0</span>
+              <span>1.7k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -215,7 +570,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <h1 id="获取启动时间大于68400秒的pod-uat"><a href="#获取启动时间大于68400秒的pod-uat" class="headerlink" title="获取启动时间大于68400秒的pod(uat)"></a>获取启动时间大于68400秒的pod(uat)</h1><p>kubectl get pods –all-namespaces -o json | jq -r ‘.items[] | select((.status.phase&#x3D;&#x3D;”Running”) and (.status.startTime !&#x3D; null) and ((now - (.status.startTime|fromdateiso8601)) &gt; 68400)) |”kubectl delete po -n (.metadata.namespace) (.metadata.name) –force –grace-period&#x3D;0”‘  |grep -E “account|agent|auth|base|clear|clearing|deduct|default|dingjia|finance|loan|login|manage|marketing|merch|message|mpos|open-platform|openapi|order|order-idc-uat|payment|posp|product|qrcode|qrcode-idc-uat|refund|relmsg|riskctrl|setting|trans|utils|xdata”  &gt; restart.sh</p>
+<p>cat restart.sh |grep -vE “cert-manager|opentelemetry-operator-system|flink-session-cluster|monitoring|kube-system|cert-manager|ingress-nginx”</p>
+<h1 id="访问https-node-exporter"><a href="#访问https-node-exporter" class="headerlink" title="访问https node-exporter"></a>访问https node-exporter</h1><p>curl -H “Authorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6InIzQXdnX1o4TnUxcGw1NUdSY0tYUS11eGMzRnZYRzQycU5RUTBhR1NDLUkifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJtb25pdG9yaW5nIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6Im5vZGUtZXhwb3J0ZXItdG9rZW4tNXBic2wiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoibm9kZS1leHBvcnRlciIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjE1YTUxMDI1LTc0ZGItNDk2ZS05NGJjLWZiNGI1ZGNkZGI0MyIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDptb25pdG9yaW5nOm5vZGUtZXhwb3J0ZXIifQ.P8lHP_W8siXBMu3jyB0ouYKBGoDQvRFsR0s7nw0rQKr2Vkp4q8D-cvmNlATtp34p8QlTemzim3q4CI-L_t-8SHZgFGL5R744SjGTD8s6iTYNymbIxsZNPRBqQTxM7ZpReX_-MeBz2F7zlzDAK7CAvo1-Rh_JyKPimbokUyNujVMwHmXEEN51ocSaqYBR6qmcyZ0LE4y5-o9XD6Jj393bZso840chiHTYprC082xREajNkptN-OkI_I8iPxgrD2L5LrECOBDayh7frwkZbrml5nd2b6iT1udJQiMqWYGhhEMWuBV7Sv4F8vT-IivQ1MRIRFtmVoU3GMM36subP-E2dw” <a target="_blank" rel="noopener" href="https://10.3.16.27:9100/metrics">https://10.3.16.27:9100/metrics</a> –cacert ca.crt  -k</p>
+
       
     </div>
 
@@ -730,7 +1088,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-count">10</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -779,12 +1137,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">10k</span>
+    <span title="站点总字数">18k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">9 分钟</span>
+    <span title="站点阅读时长">16 分钟</span>
 </div>
   <div class="powered-by">bmb
   </div>
